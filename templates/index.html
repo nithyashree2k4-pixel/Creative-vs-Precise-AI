@@ -1,0 +1,118 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Creative vs Precise AI - Temperature Experiment</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+</head>
+<body>
+    <div class="app-container">
+        <!-- Header -->
+        <header class="header">
+            <div class="badge">Project 03 &bull; LLM Challenge</div>
+            <h1>Creative vs Precise AI</h1>
+            <p class="subtitle">See how the same AI prompt can behave differently when temperature changes.</p>
+        </header>
+
+        <!-- Prompt Section -->
+        <section class="card prompt-card">
+            <form action="/" method="POST" class="prompt-form">
+                <label for="prompt" class="form-label">Your Prompt</label>
+                <textarea 
+                    id="prompt" 
+                    name="prompt" 
+                    rows="4" 
+                    placeholder="Enter your prompt here (e.g., Write a short story about a robot discovering the ocean)..."
+                    required>{{ prompt if prompt else '' }}</textarea>
+                
+                <div class="examples-container">
+                    <span class="examples-label">Try these prompts:</span>
+                    <div class="example-buttons">
+                        <button type="button" class="btn-example" onclick="setPrompt('Write a short story about a robot discovering the ocean.')">Robot &amp; Ocean Story</button>
+                        <button type="button" class="btn-example" onclick="setPrompt('Give me 5 creative ideas for a weekend project.')">5 Project Ideas</button>
+                        <button type="button" class="btn-example" onclick="setPrompt('Explain why the sky is blue in simple terms.')">Why Sky is Blue</button>
+                        <button type="button" class="btn-example" onclick="setPrompt('Write a funny dialogue between a cat and a dog.')">Cat &amp; Dog Dialogue</button>
+                    </div>
+                </div>
+
+                {% if error %}
+                    <div class="alert alert-error">{{ error }}</div>
+                {% endif %}
+
+                <div class="form-actions">
+                    <button type="submit" class="btn-submit">Compare Responses</button>
+                </div>
+            </form>
+        </section>
+
+        <!-- Experiment Parameters Info Banner -->
+        <section class="info-banner">
+            <div class="info-item">
+                <span class="info-title">Controlled Experiment</span>
+                <span class="info-desc">Same Prompt &bull; Same System Instructions &bull; Same Model</span>
+            </div>
+            <div class="info-item">
+                <span class="info-title">Experiment Variable</span>
+                <span class="info-desc">Temperature (0.2 vs 0.8)</span>
+            </div>
+        </section>
+
+        <!-- Results Section -->
+        {% if precise_result or creative_result %}
+        <section class="results-grid">
+            <!-- Precise AI Card -->
+            <div class="card response-card precise-card">
+                <div class="card-header">
+                    <div class="mode-badge precise-badge">PRECISE AI</div>
+                    <div class="meta-info">
+                        <span class="meta-tag">Temp: <strong>{{ precise_result.temp }}</strong></span>
+                        <span class="meta-tag">Model: <strong>{{ precise_result.model if precise_result.model else 'Unavailable' }}</strong></span>
+                    </div>
+                </div>
+                <div class="card-subhead">
+                    <span>Lower Temperature (0.2) &bull; Usually more focused &amp; consistent</span>
+                </div>
+                <div class="response-body">
+                    {% if precise_result.error %}
+                        <div class="alert alert-error">{{ precise_result.error }}</div>
+                    {% else %}
+                        <div class="response-content">{{ precise_result.text }}</div>
+                    {% endif %}
+                </div>
+            </div>
+
+            <!-- Creative AI Card -->
+            <div class="card response-card creative-card">
+                <div class="card-header">
+                    <div class="mode-badge creative-badge">CREATIVE AI</div>
+                    <div class="meta-info">
+                        <span class="meta-tag">Temp: <strong>{{ creative_result.temp }}</strong></span>
+                        <span class="meta-tag">Model: <strong>{{ creative_result.model if creative_result.model else 'Unavailable' }}</strong></span>
+                    </div>
+                </div>
+                <div class="card-subhead">
+                    <span>Higher Temperature (0.8) &bull; Usually more varied &amp; creative</span>
+                </div>
+                <div class="response-body">
+                    {% if creative_result.error %}
+                        <div class="alert alert-error">{{ creative_result.error }}</div>
+                    {% else %}
+                        <div class="response-content">{{ creative_result.text }}</div>
+                    {% endif %}
+                </div>
+            </div>
+        </section>
+        {% endif %}
+    </div>
+
+    <script>
+        function setPrompt(text) {
+            document.getElementById('prompt').value = text;
+        }
+    </script>
+</body>
+</html>
